@@ -10,16 +10,16 @@ from PUs.PU import PU
 
 class Env(gym.Env): 
 
-    def __init__(self, Horizon=20) -> None:
+    def __init__(self, Horizon=20, num_PU =10, num_SU=5) -> None:
         super(Env,self).__init__()
         
         self.observation_space = spaces.Discrete(Horizon + 1 )
         self.Horizon = Horizon
         self.Timer = 0 
-        self.num_agents = 3
-        self.num_PU = 5
+        self.num_agents = num_SU
+        self.num_PU = num_PU
         self.createPU(Horizon)
-        self.action_space = spaces.Box(low=0, high=2, shape=(self.num_agents, self.num_PU))
+        self.action_space = spaces.Box(low=0, high=2, shape=(self.num_agents, self.num_PU),dtype=int)
         
 
     def createPU (self, Horizon):
@@ -55,7 +55,7 @@ class Env(gym.Env):
             # r = torch.sum((action == self.TxPattern[self.Timer,:]).astype(torch.int)) 
             
             for i_agent in range(self.num_agents):
-                r[i_agent] = torch.sum(int(action[i_agent,:] == self.TxPattern[self.Timer,:]))
+                r[i_agent] = torch.sum((action[i_agent,:] == self.TxPattern[self.Timer,:]).long())
 
 
         else:  # gym horizon reached
