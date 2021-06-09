@@ -3,8 +3,11 @@ import matplotlib.pyplot as plt
 from Envs.Env import Env
 from Agents.Agents import *
 
+from Memory.memory import *
+import pickle
 
 torch.manual_seed(1234)  # python random number generator seed
+
 
 lr = 0.1  # learning rate
 gamma = 0.95  # gamma parameter
@@ -13,6 +16,8 @@ num_PU = 10
 num_SU = 5 
 Horizon =20 
 num_possible_actions = 3 
+
+memory = ReplayMemory(Horizon*num_episodes)
 
 
 # create Environment/ Import environment
@@ -42,7 +47,7 @@ for episode_i in range(num_episodes): # episode loop
         o = o_prime
         cumul_r += r  # add reward to cumulative reward
         n_successes += sum(r)  # success if optimal action-reward of 1.0
-
+        memory.push(o, a, o_prime, r)
     running_acc.append(n_successes / (env.Horizon*num_PU*num_SU))  # add latest accuracy to running data
     running_delta.append(sum(delta_update).item())  # add latest update delta to running data
     
@@ -57,6 +62,8 @@ for episode_i in range(num_episodes): # episode loop
     )
 
 
+with open ('memory.pickle','wb') as f :
+    pickle.dump(memory,f)
 
 
 env.close()  # close gym environment
